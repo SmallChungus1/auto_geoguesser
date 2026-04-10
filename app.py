@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+import random
 import tempfile
+from hashlib import sha256
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +13,7 @@ from geopy.geocoders import Nominatim
 from PIL import Image
 
 from geoclip_backend import OfflineONNXGeoCLIPBackend, OnlineGeoCLIPBackend, build_backend
+from image_utils import overlay_random_flag
 
 
 st.set_page_config(
@@ -58,6 +61,19 @@ def save_uploaded_image(uploaded_file) -> Path:
         return Path(tmp.name)
 
 
+def save_pil_image(image: Image.Image, suffix: str = ".png") -> Path:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        image.save(tmp, format="PNG")
+        return Path(tmp.name)
+
+
+def build_augmented_image(image: Image.Image, source_name: str) -> Image.Image:
+    digest = sha256(source_name.encode("utf-8") + image.tobytes()).digest()
+    seed = int.from_bytes(digest[:8], "big")
+    rng = random.Random(seed)
+    return overlay_random_flag(image, rng=rng)
+
+
 def predict(image_path: Path, top_k: int) -> pd.DataFrame:
     model = load_model()
     return model.predict(image_path, top_k=top_k)
@@ -76,6 +92,7 @@ with st.sidebar:
     model_dir = os.getenv("GEOCLIP_MODEL_DIR", "models/geoclip-large-patch14")
     st.code(f"Mode: {mode}\nBackend: {loaded_backend}\nModel dir: {model_dir}", language="text")
     top_k = st.slider("Top-K predictions", min_value=1, max_value=10, value=1)
+    apply_flag_overlay = st.checkbox("Overlay random country flag", value=False)
     st.write("GeoCLIP returns GPS coordinates. This app converts the top result into a human-readable place name when possible.")
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png", "webp"])
@@ -87,10 +104,18 @@ if uploaded_file is None:
 image = Image.open(uploaded_file).convert("RGB")
 st.image(image, caption=uploaded_file.name, use_container_width=True)
 
+if apply_flag_overlay:
+    augmented_image = build_augmented_image(image, uploaded_file.name)
+    st.caption("Augmented preview with a small random country flag overlay")
+    st.image(augmented_image, caption="GeoCLIP input after augmentation", use_container_width=True)
+else:
+    augmented_image = image
+
 predict_button = st.button("Predict location", type="primary")
 
 if predict_button:
-    tmp_path = save_uploaded_image(uploaded_file)
+    inference_image = augmented_image if apply_flag_overlay else image
+    tmp_path = save_pil_image(inference_image)
     try:
         with st.spinner("Running GeoCLIP inference..."):
             results = predict(tmp_path, top_k=top_k)
