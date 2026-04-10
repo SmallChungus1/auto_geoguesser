@@ -1,0 +1,11 @@
+streamlit>=1.31,<2
+geoclip>=1.2.0
+torch>=2.1
+torchvision>=0.16
+pillow>=10.0
+pandas>=2.0
+geopy>=2.4
+numpy>=1.26
+onnxruntime>=1.17
+transformers>=4.41,<5
+huggingface_hub>=0.24
