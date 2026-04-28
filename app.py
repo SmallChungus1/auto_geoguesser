@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+import random
 import tempfile
+from hashlib import sha256
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +13,7 @@ from geopy.geocoders import Nominatim
 from PIL import Image
 
 from geoclip_backend import OfflineONNXGeoCLIPBackend, OnlineGeoCLIPBackend, build_backend
+from image_utils import add_random_shapes_image, compress_jpeg_image
 
 
 st.set_page_config(
@@ -51,11 +54,15 @@ def reverse_geocode(lat: float, lon: float) -> str | None:
     return location.address
 
 
-def save_uploaded_image(uploaded_file) -> Path:
-    suffix = Path(uploaded_file.name).suffix or ".png"
+def save_pil_image(image: Image.Image, suffix: str = ".png", format: str = "PNG") -> Path:
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(uploaded_file.getbuffer())
+        image.save(tmp, format=format)
         return Path(tmp.name)
+
+
+def stable_rng(uploaded_file_name: str, image: Image.Image, salt: str) -> random.Random:
+    digest = sha256(salt.encode("utf-8") + uploaded_file_name.encode("utf-8") + image.tobytes()).digest()
+    return random.Random(int.from_bytes(digest[:8], "big"))
 
 
 def predict(image_path: Path, top_k: int) -> pd.DataFrame:
@@ -76,6 +83,11 @@ with st.sidebar:
     model_dir = os.getenv("GEOCLIP_MODEL_DIR", "models/geoclip-large-patch14")
     st.code(f"Mode: {mode}\nBackend: {loaded_backend}\nModel dir: {model_dir}", language="text")
     top_k = st.slider("Top-K predictions", min_value=1, max_value=10, value=1)
+    apply_jpeg_compression = st.toggle("Apply JPEG compression", value=False)
+    jpeg_quality = st.slider("JPEG quality (lower = stronger compression)", min_value=10, max_value=95, value=70)
+    apply_shapes = st.toggle("Add random shapes", value=False)
+    num_shapes = st.slider("Shape count", min_value=1, max_value=10, value=3)
+    shape_scale = st.slider("Shape size", min_value=0.05, max_value=0.4, value=0.18, step=0.01)
     st.write("GeoCLIP returns GPS coordinates. This app converts the top result into a human-readable place name when possible.")
 
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png", "webp"])
@@ -87,10 +99,30 @@ if uploaded_file is None:
 image = Image.open(uploaded_file).convert("RGB")
 st.image(image, caption=uploaded_file.name, use_container_width=True)
 
+inference_image = image
+
+if apply_jpeg_compression:
+    inference_image = compress_jpeg_image(inference_image, quality=jpeg_quality)
+    st.caption(f"JPEG-compressed preview at quality={jpeg_quality}")
+    st.image(inference_image, caption="GeoCLIP input after compression", use_container_width=True)
+
+if apply_shapes:
+    rng = stable_rng(uploaded_file.name, image, "shapes")
+    inference_image = add_random_shapes_image(
+        inference_image,
+        num_shapes=num_shapes,
+        max_shape_scale=shape_scale,
+        rng=rng,
+    )
+    st.caption(f"Random shapes preview: {num_shapes} shape(s), size={shape_scale:.2f}")
+    st.image(inference_image, caption="GeoCLIP input after shapes", use_container_width=True)
+
 predict_button = st.button("Predict location", type="primary")
 
 if predict_button:
-    tmp_path = save_uploaded_image(uploaded_file)
+    suffix = ".jpg" if apply_jpeg_compression else ".png"
+    fmt = "JPEG" if apply_jpeg_compression else "PNG"
+    tmp_path = save_pil_image(inference_image, suffix=suffix, format=fmt)
     try:
         with st.spinner("Running GeoCLIP inference..."):
             results = predict(tmp_path, top_k=top_k)

@@ -9,6 +9,8 @@ Minimal Streamlit app for running GeoCLIP on an uploaded image and converting th
 - Show the top GPS predictions
 - Reverse-geocode the best coordinate into a human-readable place name when possible
 - Optionally run fully offline from a local Hugging Face snapshot
+- Optionally apply JPEG compression before inference
+- Optionally add random opaque shapes before inference
 
 ## Setup
 
@@ -43,3 +45,5 @@ You can also leave `GEOCLIP_MODE=auto` and the app will use the local snapshot w
 - The reverse-geocoding step uses OpenStreetMap Nominatim through `geopy`.
 - If reverse geocoding fails or is rate-limited, the app falls back to showing raw coordinates.
 - The offline path uses `onnxruntime` and a local copy of `Xenova/geoclip-large-patch14`.
+- JPEG compression strength is controlled with the sidebar quality slider; lower quality means stronger compression.
+- The shape perturbation uses random squares and circles with a configurable count and size.
