@@ -12,7 +12,16 @@ from PIL import Image
 
 
 class GeoClipBackend(Protocol):
+    prediction_kind: str
+
     def predict(self, image_path: Path, top_k: int) -> pd.DataFrame:
+        ...
+
+
+class StreetClipBackend(Protocol):
+    prediction_kind: str
+
+    def predict(self, image_path: Path, labels: list[str], top_k: int) -> pd.DataFrame:
         ...
 
 
@@ -49,6 +58,8 @@ class PredictionBackendConfig:
 
 
 class OnlineGeoCLIPBackend:
+    prediction_kind = "coordinates"
+
     def __init__(self) -> None:
         _patch_transformers_clip_features()
         from geoclip import GeoCLIP
@@ -71,6 +82,8 @@ class OnlineGeoCLIPBackend:
 
 
 class OfflineONNXGeoCLIPBackend:
+    prediction_kind = "coordinates"
+
     def __init__(self, model_dir: Path, vision_model_file: str, location_model_file: str, batch_size: int) -> None:
         try:
             import numpy as np
@@ -148,6 +161,48 @@ class OfflineONNXGeoCLIPBackend:
                 }
             )
 
+        return pd.DataFrame(rows)
+
+
+class StreetCLIPZeroShotBackend:
+    prediction_kind = "labels"
+
+    def __init__(self, model_id: str = "geolocal/StreetCLIP") -> None:
+        try:
+            import torch
+            from transformers import CLIPModel, CLIPProcessor
+        except ImportError as exc:  # pragma: no cover - defensive guard for runtime deps
+            raise RuntimeError("StreetCLIP mode requires `torch` and `transformers`.") from exc
+
+        self._torch = torch
+        self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        self._processor = CLIPProcessor.from_pretrained(model_id)
+        self._model = CLIPModel.from_pretrained(model_id).to(self._device)
+        self._model.eval()
+
+    def predict(self, image_path: Path, labels: list[str], top_k: int) -> pd.DataFrame:
+        cleaned_labels = [label.strip() for label in labels if label.strip()]
+        if not cleaned_labels:
+            raise ValueError("StreetCLIP requires at least one candidate label.")
+
+        image = Image.open(image_path).convert("RGB")
+        inputs = self._processor(text=cleaned_labels, images=image, return_tensors="pt", padding=True)
+        inputs = {key: value.to(self._device) for key, value in inputs.items()}
+
+        with self._torch.inference_mode():
+            outputs = self._model(**inputs)
+            probabilities = outputs.logits_per_image.softmax(dim=1)[0].detach().cpu()
+
+        top_indices = probabilities.argsort(descending=True)[:top_k].tolist()
+        rows = []
+        for rank, index in enumerate(top_indices, start=1):
+            rows.append(
+                {
+                    "rank": rank,
+                    "label": cleaned_labels[index],
+                    "probability": float(probabilities[index].item()),
+                }
+            )
         return pd.DataFrame(rows)
 
 
