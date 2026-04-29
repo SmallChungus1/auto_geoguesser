@@ -1,13 +1,13 @@
-# GeoCLIP Streamlit Demo
+# Geo Localization Streamlit Demo
 
-Minimal Streamlit app for running GeoCLIP on an uploaded image and converting the top GPS prediction into a readable location.
+Minimal Streamlit app for running either GeoCLIP or StreetCLIP on an uploaded image.
 
 ## What it does
 
 - Upload an image
-- Run GeoCLIP inference
-- Show the top GPS predictions
-- Reverse-geocode the best coordinate into a human-readable place name when possible
+- Run GeoCLIP inference and show top GPS predictions
+- Reverse-geocode the best GeoCLIP coordinate into a human-readable location when possible
+- Run StreetCLIP zero-shot classification against candidate location labels
 - Optionally run fully offline from a local Hugging Face snapshot
 - Optionally apply JPEG compression before inference
 - Optionally add random opaque shapes before inference
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Offline mode
+## GeoCLIP offline mode
 
 Download the model snapshot locally:
 
@@ -39,11 +39,18 @@ streamlit run app.py
 
 You can also leave `GEOCLIP_MODE=auto` and the app will use the local snapshot when `GEOCLIP_MODEL_DIR` exists, otherwise it falls back to the packaged `geoclip` backend.
 
+## StreetCLIP mode
+
+Select `StreetCLIP` in the sidebar. The app will load [`geolocal/StreetCLIP`](https://huggingface.co/geolocal/StreetCLIP) through `transformers`.
+
+Important: StreetCLIP does not emit open-ended GPS coordinates in this app. It ranks the candidate place labels you provide in the sidebar text box, one label per line.
+
 ## Notes
 
 - GeoCLIP predicts GPS coordinates, not a city name directly.
 - The reverse-geocoding step uses OpenStreetMap Nominatim through `geopy`.
 - If reverse geocoding fails or is rate-limited, the app falls back to showing raw coordinates.
 - The offline path uses `onnxruntime` and a local copy of `Xenova/geoclip-large-patch14`.
+- StreetCLIP is used as a zero-shot classifier, so output quality depends heavily on the candidate labels you provide.
 - JPEG compression strength is controlled with the sidebar quality slider; lower quality means stronger compression.
 - The shape perturbation uses random squares and circles with a configurable count and size.
