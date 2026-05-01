@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450.0" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22">Baseline vs Fine-tuned StreetCLIP Top-5 vs JPEG</text>
+<line x1="80" y1="50" x2="80" y2="420" stroke="black" stroke-width="1.5"/>
+<line x1="80" y1="420" x2="870" y2="420" stroke="black" stroke-width="1.5"/>
+<line x1="75" y1="420.0" x2="80" y2="420.0" stroke="black"/>
+<text x="70" y="424.0" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="12">0.779</text>
+<line x1="75" y1="327.50000000000045" x2="80" y2="327.50000000000045" stroke="black"/>
+<text x="70" y="331.50000000000045" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="12">0.791</text>
+<line x1="75" y1="235.0" x2="80" y2="235.0" stroke="black"/>
+<text x="70" y="239.0" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="12">0.802</text>
+<line x1="75" y1="142.49999999999955" x2="80" y2="142.49999999999955" stroke="black"/>
+<text x="70" y="146.49999999999955" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="12">0.814</text>
+<line x1="75" y1="50.0" x2="80" y2="50.0" stroke="black"/>
+<text x="70" y="54.0" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="12">0.826</text>
+<line x1="80.0" y1="420" x2="80.0" y2="425" stroke="black"/>
+<text x="80.0" y="442" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" transform="rotate(25 80.0 442)">clean</text>
+<line x1="277.5" y1="420" x2="277.5" y2="425" stroke="black"/>
+<text x="277.5" y="442" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" transform="rotate(25 277.5 442)">jpeg-q90</text>
+<line x1="475.0" y1="420" x2="475.0" y2="425" stroke="black"/>
+<text x="475.0" y="442" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" transform="rotate(25 475.0 442)">jpeg-q70</text>
+<line x1="672.5" y1="420" x2="672.5" y2="425" stroke="black"/>
+<text x="672.5" y="442" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" transform="rotate(25 672.5 442)">jpeg-q50</text>
+<line x1="870.0" y1="420" x2="870.0" y2="425" stroke="black"/>
+<text x="870.0" y="442" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" transform="rotate(25 870.0 442)">jpeg-q30</text>
+<text x="450.0" y="482" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14">JPEG condition</text>
+<text x="20" y="250.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" transform="rotate(-90 20 250.0)">Top-5 accuracy</text>
+<polyline fill="none" stroke="#1f77b4" stroke-width="2.5" points="80.0,278.48290598290566 277.5,282.4358974358975 475.0,266.62393162393164 672.5,361.49572649572673 870.0,377.3076923076926"/>
+<circle cx="80.0" cy="278.48290598290566" r="4" fill="#1f77b4"/>
+<circle cx="277.5" cy="282.4358974358975" r="4" fill="#1f77b4"/>
+<circle cx="475.0" cy="266.62393162393164" r="4" fill="#1f77b4"/>
+<circle cx="672.5" cy="361.49572649572673" r="4" fill="#1f77b4"/>
+<circle cx="870.0" cy="377.3076923076926" r="4" fill="#1f77b4"/>
+<line x1="650" y1="60" x2="668" y2="60" stroke="#1f77b4" stroke-width="2.5"/>
+<circle cx="659" cy="60" r="3.5" fill="#1f77b4"/>
+<text x="676" y="64" font-family="Arial, Helvetica, sans-serif" font-size="13">Baseline</text>
+<polyline fill="none" stroke="#d62728" stroke-width="2.5" points="80.0,120.36324786324806 277.5,140.1282051282049 475.0,128.26923076923103 672.5,215.23504273504227 870.0,203.37606837606833"/>
+<circle cx="80.0" cy="120.36324786324806" r="4" fill="#d62728"/>
+<circle cx="277.5" cy="140.1282051282049" r="4" fill="#d62728"/>
+<circle cx="475.0" cy="128.26923076923103" r="4" fill="#d62728"/>
+<circle cx="672.5" cy="215.23504273504227" r="4" fill="#d62728"/>
+<circle cx="870.0" cy="203.37606837606833" r="4" fill="#d62728"/>
+<line x1="650" y1="80" x2="668" y2="80" stroke="#d62728" stroke-width="2.5"/>
+<circle cx="659" cy="80" r="3.5" fill="#d62728"/>
+<text x="676" y="84" font-family="Arial, Helvetica, sans-serif" font-size="13">Fine-tuned (clean)</text>
+<polyline fill="none" stroke="#2ca02c" stroke-width="2.5" points="80.0,92.69230769230742 277.5,104.55128205128223 475.0,100.59829059829033 672.5,183.61111111111055 870.0,187.56410256410248"/>
+<circle cx="80.0" cy="92.69230769230742" r="4" fill="#2ca02c"/>
+<circle cx="277.5" cy="104.55128205128223" r="4" fill="#2ca02c"/>
+<circle cx="475.0" cy="100.59829059829033" r="4" fill="#2ca02c"/>
+<circle cx="672.5" cy="183.61111111111055" r="4" fill="#2ca02c"/>
+<circle cx="870.0" cy="187.56410256410248" r="4" fill="#2ca02c"/>
+<line x1="650" y1="100" x2="668" y2="100" stroke="#2ca02c" stroke-width="2.5"/>
+<circle cx="659" cy="100" r="3.5" fill="#2ca02c"/>
+<text x="676" y="104" font-family="Arial, Helvetica, sans-serif" font-size="13">Fine-tuned (JPEG aug.)</text>
+</svg>
