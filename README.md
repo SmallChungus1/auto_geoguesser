@@ -63,6 +63,7 @@ Important details:
 Evaluation lives in:
 
 - [notebooks/osv5m_streetclip_eval_colab.ipynb](/Users/hansonli/Desktop/auto_geoguesser/notebooks/osv5m_streetclip_eval_colab.ipynb)
+- You'll need the 2 finetuned model weights for the eval. [Aug model here weights here](https://drive.google.com/drive/folders/1yQynYrrLEO7dBWPs9w60Whhjc6eMCjJO?usp=share_link) | [Clean model weights here](https://drive.google.com/drive/folders/1emPBGvwp1O0JkNBgG2jrcbQkQcvQOhB7?usp=share_link)
 
 Evaluation protocol:
 
@@ -144,3 +145,4 @@ Interpretation:
 - StreetCLIP does not generate captions here; it is used as an image-to-label matching model.
 - Candidate-label choice matters. This setup is a 10-way label-ranking evaluation, not unrestricted world-scale retrieval.
 - `JPEG q` refers to the JPEG quality factor. Lower `q` means stronger compression.
+- AI Usage: Codex was used to help debug and develop the training/eval pipelines as well as the streamlit app. 
